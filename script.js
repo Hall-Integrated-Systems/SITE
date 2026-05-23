@@ -68,7 +68,7 @@ document.addEventListener("DOMContentLoaded", function () {
     form.reset();
 
     if (status) {
-      status.textContent = "Thank you. Your automotive project inquiry has been captured as a placeholder submission.";
+      status.textContent = "Thank you. Your automotive project inquiry has been received for review.";
     }
   });
 });
