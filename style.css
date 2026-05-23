@@ -565,6 +565,18 @@ textarea {
   margin: 0;
 }
 
+.site-footer a {
+  display: inline-flex;
+  margin-top: 10px;
+  color: var(--white);
+  text-decoration: none;
+  font-weight: 700;
+}
+
+.site-footer a:hover {
+  color: var(--blue);
+}
+
 @media (max-width: 980px) {
   .hero,
   .two-column,
