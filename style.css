@@ -504,6 +504,14 @@ img {
   padding: 28px;
 }
 
+.contact-form [name="_honey"] {
+  position: absolute;
+  left: -10000px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+
 .form-row {
   margin-bottom: 18px;
 }
@@ -547,6 +555,11 @@ textarea {
   margin: 18px 0 0;
   color: var(--navy);
   font-weight: 700;
+}
+
+button:disabled {
+  cursor: not-allowed;
+  opacity: 0.66;
 }
 
 .contact-email strong {
