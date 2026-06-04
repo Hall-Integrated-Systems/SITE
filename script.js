@@ -42,15 +42,14 @@ document.addEventListener("DOMContentLoaded", function () {
     var values = {
       name: String(formData.get("name") || "").trim(),
       email: String(formData.get("email") || "").trim(),
-      organization: String(formData.get("organization") || "").trim(),
-      projectType: String(formData.get("projectType") || "").trim(),
+      subject: String(formData.get("subject") || "").trim(),
       message: String(formData.get("message") || "").trim()
     };
 
     setError("name", values.name ? "" : "Please enter your name.");
     setError("email", values.email ? "" : "Please enter your email address.");
-    setError("project-type", values.projectType ? "" : "Please select a project type.");
-    setError("message", values.message ? "" : "Please include a project message.");
+    setError("subject", values.subject ? "" : "Please enter a subject.");
+    setError("message", values.message ? "" : "Please include a message.");
 
     if (values.email && !emailPattern.test(values.email)) {
       setError("email", "Please enter a valid email address.");
@@ -64,11 +63,11 @@ document.addEventListener("DOMContentLoaded", function () {
       return;
     }
 
-    console.log("Hall Integrated Systems project inquiry:", values);
+    console.log("Hall Integrated Systems contact message:", values);
     form.reset();
 
     if (status) {
-      status.textContent = "Thank you. Your automotive project inquiry has been received for review.";
+      status.textContent = "Thank you. Your message has been received.";
     }
   });
 });
