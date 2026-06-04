@@ -71,10 +71,13 @@ img {
 }
 
 .brand-logo {
-  width: auto;
-  height: 38px;
-  max-width: 46px;
-  border-radius: 6px;
+  width: 34px;
+  height: 34px;
+  padding: 3px;
+  border: 1px solid rgba(140, 190, 255, 0.45);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.92);
+  box-shadow: 0 0 18px rgba(80, 150, 255, 0.24);
   object-fit: contain;
 }
 
@@ -160,11 +163,19 @@ img {
 }
 
 .hero-home {
-  min-height: clamp(600px, 76vh, 760px);
+  min-height: clamp(520px, 68vh, 660px);
   max-height: none;
+  grid-template-columns: minmax(0, 760px);
   gap: 36px;
-  padding-top: clamp(4rem, 6vw, 6rem);
-  padding-bottom: clamp(4.5rem, 6vw, 5.5rem);
+  padding-top: clamp(4rem, 7vw, 6rem);
+  padding-bottom: clamp(4rem, 7vw, 6rem);
+  background:
+    linear-gradient(90deg, rgba(5, 12, 24, 0.86) 0%, rgba(5, 12, 24, 0.68) 36%, rgba(5, 12, 24, 0.34) 68%, rgba(5, 12, 24, 0.12) 100%),
+    url("assets/his-product-lineup-banner.jpg") center right / cover no-repeat;
+}
+
+.hero-home .hero-content {
+  max-width: 760px;
 }
 
 .page-hero {
@@ -210,6 +221,15 @@ img {
   flex-wrap: wrap;
   gap: 14px;
   margin-top: 30px;
+}
+
+.hero-visual-note {
+  max-width: 540px;
+  margin: 1rem 0 0;
+  color: rgba(235, 244, 255, 0.72);
+  font-size: 0.78rem;
+  line-height: 1.5;
+  letter-spacing: 0.02em;
 }
 
 .button {
@@ -1291,6 +1311,7 @@ textarea {
     max-height: none;
     padding-top: 56px;
     padding-bottom: 56px;
+    background-position: center;
   }
 
   .hero-visual {
@@ -1335,8 +1356,8 @@ textarea {
   }
 
   .brand-logo {
-    height: 32px;
-    max-width: 40px;
+    width: 30px;
+    height: 30px;
   }
 
   .nav-toggle {
@@ -1378,10 +1399,6 @@ textarea {
 
   .hero-home {
     padding-bottom: 44px;
-  }
-
-  .hero-home .hero-product-card img {
-    max-height: 260px;
   }
 
   .hero h1,
