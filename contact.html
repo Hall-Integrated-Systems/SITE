@@ -4,22 +4,24 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Contact | Hall Integrated Systems, LLC</title>
-  <meta name="description" content="Contact Hall Integrated Systems, LLC about dashcam integration, automotive audio support, clean wiring, 12V accessories, and prototype automotive components.">
+  <meta name="description" content="Contact Hall Integrated Systems, LLC about prototype automotive installation hardware, 3D-printed car audio component concepts, and 12V electronics mounting hardware development.">
+  <link rel="icon" type="image/png" href="assets/logo-h-circuit-nohalo.png">
+  <link rel="apple-touch-icon" href="assets/logo-h-circuit-nohalo.png">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <header class="site-header">
     <nav class="navbar" aria-label="Main navigation">
       <a class="brand" href="index.html" aria-label="Hall Integrated Systems home">
-        <img src="assets/logo.png" alt="Hall Integrated Systems H logo" class="brand-logo">
+        <img src="assets/logo-h-circuit-nohalo.png" alt="Hall Integrated Systems H circuit logo" class="brand-logo">
         <span class="brand-text">Hall Integrated Systems</span>
       </a>
       <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="primary-navigation" aria-label="Toggle navigation"><span></span><span></span><span></span></button>
       <ul class="nav-links" id="primary-navigation">
         <li><a href="index.html">Home</a></li>
-        <li><a href="about.html">About</a></li>
-        <li><a href="services.html">Services</a></li>
         <li><a href="products.html">Products &amp; Prototypes</a></li>
+        <li><a href="design-fabrication.html">Design &amp; Fabrication</a></li>
+        <li><a href="about.html">About</a></li>
         <li><a class="active" href="contact.html" aria-current="page">Contact</a></li>
       </ul>
     </nav>
@@ -29,7 +31,7 @@
     <section class="page-hero">
       <p class="eyebrow">Contact</p>
       <h1>Start an automotive project inquiry.</h1>
-      <p>Use this form for dashcam integration, audio integration support, clean wiring, 12V accessory planning, custom mounting concepts, install cleanup, or prototype automotive component inquiries.</p>
+      <p>Use this form for prototype automotive installation hardware, car audio product concepts, clean wiring hardware, 12V component development, custom mounting concepts, or prototype automotive component inquiries.</p>
     </section>
 
     <section class="section contact-layout">
@@ -39,8 +41,7 @@
         <p class="contact-email">Email: <strong>info@hallintegratedsystems.com</strong></p>
       </article>
 
-      <form class="contact-form" id="contact-form" data-endpoint="https://formsubmit.co/ajax/info@hallintegratedsystems.com" novalidate>
-        <input type="text" id="website" name="_honey" autocomplete="off" tabindex="-1" aria-hidden="true">
+      <form class="contact-form" id="contact-form" novalidate>
         <div class="form-row">
           <label for="name">Name</label>
           <input type="text" id="name" name="name" autocomplete="name" required>
@@ -59,14 +60,16 @@
           <label for="project-type">Project Type</label>
           <select id="project-type" name="projectType" required>
             <option value="">Select a project type</option>
-            <option>Dashcam integration</option>
-            <option>Audio integration</option>
-            <option>Vehicle electronics accessory support</option>
-            <option>Clean wiring / cable routing</option>
-            <option>12V accessory troubleshooting</option>
+            <option>Prototype car audio installation hardware</option>
+            <option>4-wire speaker cable comb development</option>
+            <option>Dashcam mounting hardware concept</option>
+            <option>Car audio installation hardware concept</option>
+            <option>Vehicle electronics accessory mounting hardware</option>
+            <option>Clean wiring / cable routing hardware</option>
+            <option>12V accessory hardware concept</option>
             <option>Custom bracket or mounting solution</option>
             <option>Prototype automotive component</option>
-            <option>Install cleanup / correction</option>
+            <option>Prototype fitment or fabrication question</option>
           </select>
           <p class="field-error" id="project-type-error"></p>
         </div>
@@ -83,7 +86,10 @@
 
   <footer class="site-footer">
     <p>&copy; 2026 Hall Integrated Systems, LLC. All rights reserved.</p>
-    <a href="privacy.html">Privacy</a>
+    <div class="footer-links">
+      <a href="privacy.html">Privacy</a>
+      <a href="sitemap.xml">Sitemap</a>
+    </div>
   </footer>
   <script src="script.js"></script>
 </body>

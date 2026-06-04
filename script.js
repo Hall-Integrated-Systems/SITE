@@ -39,14 +39,12 @@ document.addEventListener("DOMContentLoaded", function () {
     event.preventDefault();
 
     var formData = new FormData(form);
-    var submitButton = form.querySelector('button[type="submit"]');
     var values = {
       name: String(formData.get("name") || "").trim(),
       email: String(formData.get("email") || "").trim(),
       organization: String(formData.get("organization") || "").trim(),
       projectType: String(formData.get("projectType") || "").trim(),
-      message: String(formData.get("message") || "").trim(),
-      honey: String(formData.get("_honey") || "").trim()
+      message: String(formData.get("message") || "").trim()
     };
 
     setError("name", values.name ? "" : "Please enter your name.");
@@ -66,61 +64,11 @@ document.addEventListener("DOMContentLoaded", function () {
       return;
     }
 
-    if (values.honey) {
-      form.reset();
-      if (status) {
-        status.textContent = "Thank you. Your automotive project inquiry has been received for review.";
-      }
-      return;
-    }
+    console.log("Hall Integrated Systems project inquiry:", values);
+    form.reset();
 
     if (status) {
-      status.textContent = "Submitting your inquiry...";
+      status.textContent = "Thank you. Your automotive project inquiry has been received for review.";
     }
-
-    if (submitButton) {
-      submitButton.disabled = true;
-    }
-
-    fetch(form.getAttribute("data-endpoint"), {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Accept": "application/json"
-      },
-      body: JSON.stringify({
-        name: values.name,
-        email: values.email,
-        _replyto: values.email,
-        organization: values.organization || "Not provided",
-        projectType: values.projectType,
-        message: values.message,
-        _subject: "New Hall Integrated Systems project inquiry",
-        _template: "table",
-        _honey: ""
-      })
-    })
-      .then(function (response) {
-        if (!response.ok) {
-          throw new Error("Form submission failed.");
-        }
-        return response.json();
-      })
-      .then(function () {
-        form.reset();
-        if (status) {
-          status.textContent = "Thank you. Your automotive project inquiry has been received for review.";
-        }
-      })
-      .catch(function () {
-        if (status) {
-          status.textContent = "The form could not send right now. Please email info@hallintegratedsystems.com directly.";
-        }
-      })
-      .finally(function () {
-        if (submitButton) {
-          submitButton.disabled = false;
-        }
-      });
   });
 });
