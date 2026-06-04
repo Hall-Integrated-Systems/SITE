@@ -17,10 +17,12 @@
 
 html {
   scroll-behavior: smooth;
+  overflow-x: hidden;
 }
 
 body {
   margin: 0;
+  overflow-x: hidden;
   font-family: Arial, Helvetica, sans-serif;
   color: var(--charcoal);
   background:
@@ -71,8 +73,9 @@ img {
 }
 
 .brand-logo {
-  width: 34px;
-  height: 34px;
+  flex: 0 0 42px;
+  width: 42px;
+  height: 42px;
   padding: 3px;
   border: 1px solid rgba(140, 190, 255, 0.45);
   border-radius: 8px;
@@ -182,6 +185,20 @@ img {
   padding: 88px max(24px, calc((100vw - 1000px) / 2));
 }
 
+.page-hero--image {
+  min-height: clamp(360px, 48vh, 520px);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  background:
+    linear-gradient(90deg, rgba(5, 12, 24, 0.84) 0%, rgba(5, 12, 24, 0.66) 40%, rgba(5, 12, 24, 0.3) 75%, rgba(5, 12, 24, 0.12) 100%),
+    url("assets/his-product-lineup-banner.jpg") center right / cover no-repeat;
+}
+
+.page-hero--image.compact-hero {
+  min-height: clamp(320px, 40vh, 440px);
+}
+
 .hero-content,
 .page-hero {
   z-index: 1;
@@ -230,6 +247,13 @@ img {
   font-size: 0.78rem;
   line-height: 1.5;
   letter-spacing: 0.02em;
+}
+
+.page-hero .hero-visual-note {
+  max-width: 540px;
+  color: rgba(235, 244, 255, 0.72);
+  font-size: 0.78rem;
+  line-height: 1.5;
 }
 
 .button {
@@ -630,6 +654,63 @@ img {
   font-weight: 700;
 }
 
+.sitemap-page {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 22px;
+  align-items: start;
+}
+
+.sitemap-group {
+  min-height: 100%;
+  padding: 26px;
+  border: 1px solid rgba(10, 25, 49, 0.1);
+  border-radius: var(--radius);
+  background: var(--white);
+  box-shadow: 0 10px 34px rgba(10, 25, 49, 0.08);
+}
+
+.sitemap-group h2 {
+  margin: 0 0 18px;
+  color: var(--navy);
+}
+
+.sitemap-group ul {
+  display: grid;
+  gap: 14px;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+
+.sitemap-group li {
+  display: grid;
+  gap: 5px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid rgba(10, 25, 49, 0.08);
+}
+
+.sitemap-group li:last-child {
+  padding-bottom: 0;
+  border-bottom: 0;
+}
+
+.sitemap-group a {
+  color: var(--navy);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.sitemap-group a:hover {
+  color: var(--blue);
+}
+
+.sitemap-group span {
+  color: var(--muted);
+  font-size: 0.9rem;
+  overflow-wrap: anywhere;
+}
+
 .dark-section .lineup-banner-caption,
 .lineup-banner-wrap.dark-banner .lineup-banner-caption {
   color: rgba(255, 255, 255, 0.78);
@@ -716,6 +797,62 @@ img {
   grid-template-columns: minmax(0, 1fr) minmax(320px, 0.85fr);
   gap: 28px;
   align-items: start;
+}
+
+.founder-section {
+  display: grid;
+  grid-template-columns: minmax(280px, 0.9fr) minmax(0, 1.1fr);
+  gap: 32px;
+  align-items: center;
+}
+
+.founder-photo-card {
+  margin: 0;
+  padding: 14px;
+  border: 1px solid rgba(10, 25, 49, 0.12);
+  border-radius: 8px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(245, 245, 245, 0.96)),
+    repeating-linear-gradient(90deg, transparent 0 36px, rgba(108, 160, 220, 0.08) 37px);
+  box-shadow: var(--shadow);
+}
+
+.founder-photo-card img {
+  display: block;
+  width: 100%;
+  max-height: 460px;
+  object-fit: cover;
+  border: 1px solid rgba(10, 25, 49, 0.12);
+  border-radius: 8px;
+}
+
+.founder-photo-card figcaption {
+  margin-top: 10px;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.founder-copy p:not(.eyebrow),
+.about-content-grid p {
+  color: var(--muted);
+}
+
+.founder-note {
+  margin: 22px 0 0;
+  padding: 18px;
+  border-left: 3px solid var(--blue);
+  border-radius: 8px;
+  background:
+    linear-gradient(180deg, rgba(245, 245, 245, 0.92), rgba(255, 255, 255, 0.92)),
+    repeating-linear-gradient(90deg, transparent 0 34px, rgba(108, 160, 220, 0.08) 35px);
+  color: var(--navy);
+  font-weight: 700;
+}
+
+.about-content-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 22px;
 }
 
 .technical-card,
@@ -1292,6 +1429,7 @@ textarea {
 @media (max-width: 980px) {
   .hero,
   .two-column,
+  .founder-section,
   .contact-layout,
   .product-development-band,
   .visual-process-band,
@@ -1324,6 +1462,8 @@ textarea {
 
   .card-grid,
   .three-column,
+  .about-content-grid,
+  .sitemap-page,
   .visual-gallery,
   .roadmap-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -1356,8 +1496,9 @@ textarea {
   }
 
   .brand-logo {
-    width: 30px;
-    height: 30px;
+    flex-basis: 36px;
+    width: 36px;
+    height: 36px;
   }
 
   .nav-toggle {
@@ -1391,6 +1532,13 @@ textarea {
   .page-hero {
     padding-left: 20px;
     padding-right: 20px;
+  }
+
+  .page-hero--image {
+    min-height: auto;
+    padding-top: 62px;
+    padding-bottom: 62px;
+    background-position: center;
   }
 
   .hero {
@@ -1429,6 +1577,8 @@ textarea {
 
   .card-grid,
   .three-column,
+  .about-content-grid,
+  .sitemap-page,
   .visual-gallery,
   .roadmap-grid,
   .workflow,
