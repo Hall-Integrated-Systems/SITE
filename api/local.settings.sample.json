@@ -1,0 +1,13 @@
+{
+  "IsEncrypted": false,
+  "Values": {
+    "AzureWebJobsStorage": "UseDevelopmentStorage=true",
+    "FUNCTIONS_WORKER_RUNTIME": "node",
+    "GRAPH_TENANT_ID": "00000000-0000-0000-0000-000000000000",
+    "GRAPH_CLIENT_ID": "00000000-0000-0000-0000-000000000000",
+    "GRAPH_CLIENT_SECRET": "replace-with-client-secret",
+    "GRAPH_SENDER": "sender@example.com",
+    "CONTACT_RECIPIENT": "recipient@example.com",
+    "CONTACT_ALLOWED_ORIGINS": "http://localhost:8080,http://127.0.0.1:8080"
+  }
+}

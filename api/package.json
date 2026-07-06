@@ -1,0 +1,14 @@
+{
+  "name": "hall-integrated-systems-contact-api",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Local Azure Functions scaffold for the Hall Integrated Systems contact form.",
+  "main": "src/functions/*.js",
+  "scripts": {
+    "start": "func start",
+    "check": "node --check src/functions/contact.js"
+  },
+  "dependencies": {
+    "@azure/functions": "^4.7.2"
+  }
+}
