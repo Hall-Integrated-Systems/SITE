@@ -105,6 +105,7 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   var status = document.getElementById("form-status");
+  var submitButton = form.querySelector('button[type="submit"]');
   var emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
   function setError(fieldId, message) {
@@ -146,11 +147,46 @@ document.addEventListener("DOMContentLoaded", function () {
       return;
     }
 
-    console.log("Hall Integrated Systems contact message:", values);
-    form.reset();
-
     if (status) {
-      status.textContent = "Thank you. Your message has been received.";
+      status.textContent = "Sending message...";
     }
+
+    if (submitButton) {
+      submitButton.disabled = true;
+    }
+
+    fetch(form.action, {
+      method: (form.method || "POST").toUpperCase(),
+      body: new FormData(form),
+      headers: {
+        Accept: "application/json"
+      }
+    })
+      .then(function (response) {
+        if (!response.ok) {
+          throw new Error("Form submission failed.");
+        }
+        return response.json().catch(function () {
+          return {};
+        });
+      })
+      .then(function () {
+        form.reset();
+        trackClarityEvent("contact_form_submit_success");
+
+        if (status) {
+          status.textContent = "Thank you. Your message has been received.";
+        }
+      })
+      .catch(function () {
+        if (status) {
+          status.textContent = "Message could not be sent. Please email info@hallintegratedsystems.com directly.";
+        }
+      })
+      .finally(function () {
+        if (submitButton) {
+          submitButton.disabled = false;
+        }
+      });
   });
 });

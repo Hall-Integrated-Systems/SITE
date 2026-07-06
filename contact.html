@@ -49,7 +49,14 @@
         <p class="contact-email">Email: <strong>info@hallintegratedsystems.com</strong></p>
       </article>
 
-      <form class="contact-form" id="contact-form" novalidate>
+      <form class="contact-form" id="contact-form" action="https://formsubmit.co/ajax/info@hallintegratedsystems.com" method="POST" novalidate>
+        <input type="hidden" name="_subject" value="Hall Integrated Systems contact form message">
+        <input type="hidden" name="_template" value="table">
+        <input type="hidden" name="_captcha" value="false">
+        <div class="form-honeypot" aria-hidden="true">
+          <label for="contact-honey">Leave this field blank</label>
+          <input type="text" id="contact-honey" name="_honey" tabindex="-1" autocomplete="off">
+        </div>
         <div class="form-row">
           <label for="name">Name</label>
           <input type="text" id="name" name="name" autocomplete="name" required>
