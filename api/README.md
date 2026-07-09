@@ -34,6 +34,10 @@ With the default Functions route prefix, the function is available locally at:
 - `CONTACT_RECIPIENT`: Destination mailbox for contact form messages.
 - `CONTACT_ALLOWED_ORIGINS`: Comma-separated browser origins allowed to call the function.
 
+Optional:
+
+- `CONTACT_ALLOW_NO_ORIGIN_POST`: Set exactly to `true` only for trusted non-browser POST clients that cannot send an `Origin` header. Production should leave this unset or set to `false`.
+
 If `CONTACT_ALLOWED_ORIGINS` is not set, the local defaults are:
 
 - `http://localhost:8080`

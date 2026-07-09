@@ -54,6 +54,13 @@ async function contact(request, context) {
     }, cors);
   }
 
+  if (!origin && !allowNoOriginPost()) {
+    return jsonResponse(403, {
+      ok: false,
+      error: "Origin is required.",
+    }, cors);
+  }
+
   let body;
   try {
     body = await request.json();
@@ -118,6 +125,10 @@ function normalizeOrigin(origin) {
 
 function isAllowedOrigin(origin, allowedOrigins) {
   return allowedOrigins.has(normalizeOrigin(origin));
+}
+
+function allowNoOriginPost() {
+  return process.env.CONTACT_ALLOW_NO_ORIGIN_POST === "true";
 }
 
 function getCorsHeaders(origin, allowedOrigins) {
