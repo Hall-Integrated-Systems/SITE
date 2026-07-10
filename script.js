@@ -119,15 +119,20 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   }
 
+  function getFormFieldValue(fieldName) {
+    var field = form.querySelector('[name="' + fieldName + '"]');
+    return String(field ? field.value : "").trim();
+  }
+
   form.addEventListener("submit", function (event) {
     event.preventDefault();
 
-    var formData = new FormData(form);
     var values = {
-      name: String(formData.get("name") || "").trim(),
-      email: String(formData.get("email") || "").trim(),
-      subject: String(formData.get("subject") || "").trim(),
-      message: String(formData.get("message") || "").trim()
+      name: getFormFieldValue("name"),
+      email: getFormFieldValue("email"),
+      subject: getFormFieldValue("subject"),
+      message: getFormFieldValue("message"),
+      _honey: getFormFieldValue("_honey")
     };
 
     setError("name", values.name ? "" : "Please enter your name.");
@@ -157,8 +162,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
     fetch(form.action, {
       method: (form.method || "POST").toUpperCase(),
-      body: new FormData(form),
+      body: JSON.stringify(values),
       headers: {
+        "Content-Type": "application/json",
         Accept: "application/json"
       }
     })
