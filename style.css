@@ -1036,6 +1036,20 @@ img {
   font-size: 0.92rem;
 }
 
+.concept-spec-sheet {
+  margin-top: 28px;
+}
+
+.concept-spec-sheet .product-render {
+  min-height: 0;
+  max-height: none;
+  aspect-ratio: 16 / 9;
+}
+
+.concept-spec-link {
+  margin-top: 16px;
+}
+
 .product-placeholder {
   position: relative;
   min-height: 390px;
