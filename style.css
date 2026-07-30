@@ -1190,24 +1190,86 @@ img {
   overflow: hidden;
 }
 
-.schematic-ring,
-.schematic-bracket {
-  display: block;
-  width: 180px;
-  height: 180px;
-  margin: 16px auto 0;
-  border: 2px solid rgba(108, 160, 220, 0.84);
-  background: rgba(108, 160, 220, 0.08);
-}
-
-.schematic-ring {
-  border-radius: 50%;
-  box-shadow: inset 0 0 0 38px rgba(10, 25, 49, 0.96), inset 0 0 0 41px rgba(200, 208, 216, 0.54);
-}
-
-.schematic-bracket {
+.category-diagram {
+  margin: 0;
+  overflow: hidden;
+  border: 1px solid #6f8294;
   border-radius: 8px;
-  clip-path: polygon(0 0, 100% 0, 100% 34%, 58% 34%, 58% 100%, 0 100%);
+  background: #0c1c35;
+}
+
+.category-diagram svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.category-diagram figcaption {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 10px 12px;
+  border-top: 1px solid #6f8294;
+  background: #263543;
+  color: var(--white);
+  line-height: 1.25;
+}
+
+.category-diagram figcaption span {
+  color: #c7d2dc;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.diagram-frame {
+  fill: #0c1c35;
+  stroke: #49627b;
+  stroke-width: 2;
+}
+
+.diagram-part {
+  fill: #344250;
+  stroke: #82b9ff;
+  stroke-width: 3;
+}
+
+.diagram-opening {
+  fill: #0c1c35;
+  stroke: #c7d2dc;
+  stroke-width: 3;
+}
+
+.diagram-hole {
+  fill: #0c1c35;
+  stroke: #e7edf3;
+  stroke-width: 2;
+}
+
+.diagram-leader {
+  fill: none;
+  stroke: var(--cyan);
+  stroke-width: 2;
+}
+
+.diagram-label,
+.diagram-note {
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.diagram-label {
+  fill: var(--white);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+.diagram-note {
+  fill: #c7d2dc;
+  font-size: 7px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
 }
 
 .product-detail-layout {
@@ -2063,23 +2125,6 @@ body {
 .dark-section .section-heading p:not(.eyebrow),
 .dark-section .lineup-banner-caption {
   color: #e7edf3;
-}
-
-.dark-section .schematic-ring,
-.dark-section .schematic-bracket {
-  border-color: #82b9ff;
-  background: #465c70;
-}
-
-.dark-section .schematic-ring {
-  box-shadow:
-    inset 0 0 0 38px #0c1c35,
-    inset 0 0 0 42px #c7d2dc,
-    0 0 0 8px rgba(130, 185, 255, 0.1);
-}
-
-.dark-section .schematic-bracket {
-  box-shadow: 12px 12px 0 rgba(130, 185, 255, 0.14);
 }
 
 .product-render {
