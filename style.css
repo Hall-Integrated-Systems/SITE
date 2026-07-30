@@ -1647,6 +1647,7 @@ textarea {
   --navy: #071a3d;
   --blue: #1478ff;
   --cyan: #16d9ff;
+  --accent-text: #064cae;
   --violet: #8b5cf6;
   --charcoal: #14233a;
   --silver: #d1d1d1;
@@ -1818,8 +1819,17 @@ body {
 }
 
 .eyebrow {
-  color: var(--cyan);
+  color: var(--accent-text);
   letter-spacing: 0.12em;
+}
+
+.hero .eyebrow,
+.page-hero .eyebrow,
+.dark-section .eyebrow,
+.cta-band .eyebrow,
+.product-detail-panel .eyebrow,
+.process-visual-grid .eyebrow {
+  color: var(--cyan);
 }
 
 .hero-refresh .eyebrow {
