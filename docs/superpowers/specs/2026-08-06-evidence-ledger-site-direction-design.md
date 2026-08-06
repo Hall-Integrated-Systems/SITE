@@ -260,6 +260,8 @@ Every product visual receives one of these labels:
 Source responsibilities remain:
 
 - SharePoint holds untouched originals, CAD documentation, product records, approved masters, and recovery material.
+- The canonical SharePoint CAD path for HIS-CA-001A is `Documents/Products/HIS-CA-001A Cable Comb/03 CAD` on the `Hall Integrated Systems` site (`/sites/allcompany`).
+- The synced read-only local mirror is `C:\Users\Tango\OneDrive - HALL INTEGRATED SYTEMS\Documents\SharePoint-Documents\Products\HIS-CA-001A Cable Comb\03 CAD`.
 - Adobe handles authentic photographic correction and optimized export.
 - Creative Production supports visual concept development and review.
 - GitHub contains only approved public web derivatives.
@@ -279,6 +281,7 @@ The disclosures and source-preservation notes in `assets/products/website-photo-
 ### Conditional
 
 - New HIS-CA-001A CAD screenshots or renders, after confirming they match the documented REV-A geometry and are safe for public export.
+- `HIS-CA-001A_REV-A_Master.png` from the canonical CAD folder may be used as a source-preserving public derivative labeled “CAD work in progress.” Its visible geometry supports CAD activity but does not prove that the documented REV-A retention and mounting decisions are complete.
 - New prototype photographs, after a physical part is printed and the photographs are approved.
 
 ### Excluded from current-proof placement
