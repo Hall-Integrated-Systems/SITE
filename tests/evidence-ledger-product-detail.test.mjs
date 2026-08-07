@@ -16,9 +16,17 @@ test("product page shows all seven status gates in order", () => {
   const rail = html.match(/<ol class="development-rail"[^>]*>([\s\S]*?)<\/ol>/);
   assert.ok(rail, "Missing development status rail");
 
-  const stages = [...rail[1].matchAll(
-    /<li\b([^>]*)>[\s\S]*?<span class="stage-name">([^<]+)<\/span>\s*<\/li>/g
-  )].map(([, attributes, name]) => ({ attributes, name }));
+  const stageItems = [...rail[1].matchAll(/<li\b([^>]*)>([\s\S]*?)<\/li>/g)]
+    .map(([, attributes, content]) => ({ attributes, content }));
+  assert.equal(stageItems.length, 7);
+
+  const stages = stageItems.map(({ attributes, content }, index) => {
+    const names = [...content.matchAll(
+      /<span class="stage-name">([^<]+)<\/span>/g
+    )];
+    assert.equal(names.length, 1, `Stage ${index + 1} must have exactly one name`);
+    return { attributes, name: names[0][1] };
+  });
 
   assert.deepEqual(stages.map(({ name }) => name), [
     "Concept defined",
@@ -38,6 +46,48 @@ test("product page shows all seven status gates in order", () => {
 });
 
 test("product page separates verified and pending evidence", () => {
+  const truthSplit = html.match(/<div class="truth-split">([\s\S]*?)<\/div>/);
+  assert.ok(truthSplit, "Missing verified and pending evidence split");
+
+  const panels = [...truthSplit[1].matchAll(
+    /<article\b([^>]*)>([\s\S]*?)<\/article>/g
+  )].map(([, attributes, content]) => ({ attributes, content }));
+  assert.equal(panels.length, 2);
+
+  const panelClasses = panels.map(({ attributes }, index) => {
+    const classAttribute = attributes.match(/\bclass="([^"]*)"/);
+    assert.ok(classAttribute, `Evidence panel ${index + 1} must have classes`);
+    return classAttribute[1].split(/\s+/);
+  });
+
+  assert.ok(panelClasses[0].includes("evidence-panel"));
+  assert.ok(!panelClasses[0].includes("pending"));
+  assert.deepEqual(
+    [...panels[0].content.matchAll(/<h3>([^<]+)<\/h3>/g)]
+      .map(([, heading]) => heading),
+    ["Verified now"]
+  );
+  assertContainsInOrder(panels[0].content, [
+    "Automotive wire-routing problem and four-channel concept defined",
+    "REV-A working decision documented",
+    "Commercial CAD access established",
+    "CAD work-in-progress capture archived"
+  ]);
+
+  assert.ok(panelClasses[1].includes("evidence-panel"));
+  assert.ok(panelClasses[1].includes("pending"));
+  assert.deepEqual(
+    [...panels[1].content.matchAll(/<h3>([^<]+)<\/h3>/g)]
+      .map(([, heading]) => heading),
+    ["Pending evidence"]
+  );
+  assertContainsInOrder(panels[1].content, [
+    "Critical cable, zip-tie, screw-head, mounting-depth, and access measurements frozen",
+    "Current REV-A geometry confirmed",
+    "Representative coupon and complete prototype printed",
+    "Fit, vibration, pull, and serviceability checks completed"
+  ]);
+
   assertContainsInOrder(html, [
     "Verified now",
     "Pending evidence",
