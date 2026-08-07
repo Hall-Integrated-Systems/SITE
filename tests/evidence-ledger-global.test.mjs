@@ -49,11 +49,62 @@ function decodeText(html) {
     .trim();
 }
 
+function decodeHtmlEntities(text) {
+  const namedEntities = new Map([
+    ["amp", "&"],
+    ["apos", "'"],
+    ["emsp", " "],
+    ["ensp", " "],
+    ["gt", ">"],
+    ["hairsp", " "],
+    ["lt", "<"],
+    ["nbsp", " "],
+    ["newline", " "],
+    ["quot", '"'],
+    ["tab", " "],
+    ["thinsp", " "]
+  ]);
+
+  return text.replace(/&(#x[\da-f]+|#\d+|[a-z][\da-z]+);/gi, (entity, token) => {
+    if (token.startsWith("#")) {
+      const hexadecimal = token[1]?.toLowerCase() === "x";
+      const codePoint = Number.parseInt(token.slice(hexadecimal ? 2 : 1), hexadecimal ? 16 : 10);
+      const isValid = Number.isInteger(codePoint)
+        && codePoint >= 0
+        && codePoint <= 0x10ffff
+        && !(codePoint >= 0xd800 && codePoint <= 0xdfff);
+      return isValid ? String.fromCodePoint(codePoint) : entity;
+    }
+
+    return namedEntities.get(token.toLowerCase()) ?? entity;
+  });
+}
+
+function renderedVisibleText(html) {
+  const textOnly = html
+    .replace(/<!--[\s\S]*?-->/g, " ")
+    .replace(/<(script|style|template|noscript)\b[^>]*>[\s\S]*?<\/\1>/gi, " ")
+    .replace(/<[^>]+>/g, " ");
+
+  return decodeHtmlEntities(textOnly).replace(/\s+/gu, " ").trim();
+}
+
+function assertAutomotiveScope(route, html) {
+  const visibleText = renderedVisibleText(html).toLowerCase();
+  for (const topic of forbiddenTopics) {
+    assert.ok(!visibleText.includes(topic.toLowerCase()), `${route} contains forbidden topic: ${topic}`);
+  }
+}
+
+function attributeValue(attributes, name) {
+  return attributes.match(new RegExp(`\\b${name}\\s*=\\s*(["'])(.*?)\\1`, "i"))?.[2];
+}
+
 function linksIn(html) {
   return [...html.matchAll(/<a\b([^>]*)>([\s\S]*?)<\/a>/gi)].map((match) => {
-    const href = match[1].match(/\bhref\s*=\s*(["'])(.*?)\1/i);
     return {
-      href: href?.[2],
+      attributes: match[1],
+      href: attributeValue(match[1], "href"),
       label: decodeText(match[2])
     };
   });
@@ -87,6 +138,8 @@ function assertNavigationContract(route, html) {
 function assertRefreshedShellContract(route, html) {
   const prefix = expectedAssetPrefix(route);
   const escapedPrefix = escapeRegExp(prefix);
+  const header = extractElement(html, "header", `${route} site header`);
+  const footer = extractElement(html, "footer", `${route} site footer`);
   assert.match(
     html,
     new RegExp(`<link\\b(?=[^>]*\\brel\\s*=\\s*(["'])stylesheet\\1)(?=[^>]*\\bhref\\s*=\\s*(["'])${escapedPrefix}style\\.css\\2)[^>]*>`, "i"),
@@ -97,8 +150,27 @@ function assertRefreshedShellContract(route, html) {
     new RegExp(`<script\\b(?=[^>]*\\bsrc\\s*=\\s*(["'])${escapedPrefix}script\\.js\\1)[^>]*>\\s*</script>`, "i"),
     `${route} lost its route-relative script include`
   );
-  assert.match(html, /<header\b[^>]*class\s*=\s*(["'])[^"']*\bsite-header\b[^"']*\1[^>]*>/i, `${route} lost its site header`);
-  assert.match(html, /<footer\b[^>]*class\s*=\s*(["'])[^"']*\bsite-footer\b[^"']*\1[^>]*>/i, `${route} lost its site footer`);
+  assert.match(header, /<header\b[^>]*class\s*=\s*(["'])[^"']*\bsite-header\b[^"']*\1[^>]*>/i, `${route} lost its site header`);
+  assert.match(footer, /<footer\b[^>]*class\s*=\s*(["'])[^"']*\bsite-footer\b[^"']*\1[^>]*>/i, `${route} lost its site footer`);
+
+  const brandLinks = linksIn(header).filter((link) => {
+    const classes = attributeValue(link.attributes, "class")?.split(/\s+/) ?? [];
+    return classes.includes("brand");
+  });
+  assert.equal(brandLinks.length, 1, `${route} must contain one header brand link`);
+  assert.equal(brandLinks[0].href, `${prefix}index.html`, `${route} has the wrong brand-home destination`);
+
+  const footerLinks = linksIn(footer);
+  for (const [label, destination] of [["Privacy", "privacy.html"], ["Sitemap", "sitemap.html"]]) {
+    const matchingLinks = footerLinks.filter((link) => link.label === label);
+    assert.equal(matchingLinks.length, 1, `${route} must contain one "${label}" footer link`);
+    assert.equal(
+      matchingLinks[0].href,
+      `${prefix}${destination}`,
+      `${route} has the wrong footer destination for "${label}"`
+    );
+  }
+
   assertNavigationContract(route, html);
 }
 
@@ -122,10 +194,20 @@ test("refreshed routes contain no stale licensing blocker", () => {
 
 test("public routes stay within the complete automotive-only scope", () => {
   for (const route of routes) {
-    const html = readText(route).toLowerCase();
-    for (const topic of forbiddenTopics) {
-      assert.ok(!html.includes(topic.toLowerCase()), `${route} contains forbidden topic: ${topic}`);
-    }
+    assertAutomotiveScope(route, readText(route));
+  }
+});
+
+test("automotive-scope checks reject encoded and markup-split visible phrases", () => {
+  const mutations = [
+    "<main>smart&#32;home</main>",
+    "<main>smart&#x20;home</main>",
+    "<main>smart&nbsp;home</main>",
+    "<main>smart <span>home</span></main>"
+  ];
+
+  for (const mutation of mutations) {
+    assert.throws(() => assertAutomotiveScope("in-memory.html", mutation), /smart home/);
   }
 });
 
@@ -141,14 +223,31 @@ test("refreshed routes preserve the shared header, footer, stylesheet, and scrip
   }
 });
 
-test("shell checks reject an in-memory route-relative navigation regression", () => {
+test("shell checks reject in-memory nested-route relationship regressions", () => {
   const route = "products/his-ca-001a-cable-comb.html";
-  const mutatedHtml = readText(route).replace('href="../contact.html">Contact', 'href="contact.html">Contact');
+  const html = readText(route);
+  const mutations = [
+    [
+      html.replace('class="brand" href="../index.html"', 'class="brand" href="index.html"'),
+      /wrong brand-home destination/
+    ],
+    [
+      html.replace('href="../contact.html">Contact', 'href="contact.html">Contact'),
+      /wrong primary-navigation destination for "Contact"/
+    ],
+    [
+      html.replace('href="../privacy.html">Privacy', 'href="privacy.html">Privacy'),
+      /wrong footer destination for "Privacy"/
+    ],
+    [
+      html.replace('href="../sitemap.html">Sitemap', 'href="sitemap.html">Sitemap'),
+      /wrong footer destination for "Sitemap"/
+    ]
+  ];
 
-  assert.throws(
-    () => assertRefreshedShellContract(route, mutatedHtml),
-    /wrong primary-navigation destination for "Contact"/
-  );
+  for (const [mutatedHtml, expectedError] of mutations) {
+    assert.throws(() => assertRefreshedShellContract(route, mutatedHtml), expectedError);
+  }
 });
 
 test("static hosting and contact files retain required signals", () => {
