@@ -26,6 +26,30 @@ test("only HIS-CA-001A is shown in CAD progress", () => {
   assert.equal((plannedProducts.match(/Planned concept/g) || []).length, 5);
 });
 
+test("planned queue binds all five SKUs to ordered ledger cards", () => {
+  const plannedProducts = html.match(/<section class="section" aria-labelledby="planned-products-heading"[\s\S]*?<section class="section status-section"/)?.[0] ?? "";
+  const plannedCards = [...plannedProducts.matchAll(/<article class="ledger-card planned">([\s\S]*?)<\/article>/g)];
+  const plannedSkus = plannedCards.map(([, card]) => card.match(/<h3>(HIS-CA-\d{3}A)<\/h3>/)?.[1]);
+
+  assert.equal(plannedCards.length, 5);
+  assert.deepEqual(plannedSkus, [
+    "HIS-CA-002A",
+    "HIS-CA-003A",
+    "HIS-CA-004A",
+    "HIS-CA-005A",
+    "HIS-CA-006A"
+  ]);
+});
+
+test("status rail marks CAD in progress as the current step", () => {
+  const statusSection = html.match(/<section class="section status-section"[\s\S]*?<\/section>/)?.[0] ?? "";
+
+  assert.match(
+    statusSection,
+    /<li class="is-current" aria-current="step"><span class="stage-state">Current<\/span><span class="stage-name">CAD in progress<\/span><\/li>/
+  );
+});
+
 test("products page removes fabricated diagrams and current-proof misuse", () => {
   assert.doesNotMatch(html, /<svg\b/i);
   assert.doesNotMatch(html, /category-diagram|schematic-card/);
