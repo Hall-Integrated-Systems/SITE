@@ -26,10 +26,13 @@ test("Design & Fabrication presents exactly eight ordered evidence gates", () =>
   const listMatch = section.match(/<ol\b[^>]*class="[^"]*\bevidence-process\b[^"]*"[^>]*>([\s\S]*?)<\/ol>/);
   assert.ok(listMatch, "Evidence-process section must contain an evidence-process ordered list");
 
-  const items = [...listMatch[1].matchAll(/<li\b[^>]*>\s*<strong>([^<]+)<\/strong>/g)]
-    .map((match) => match[1]);
+  const itemMatches = [...listMatch[1].matchAll(/<li\b[^>]*>([\s\S]*?)<\/li>/g)];
+  assert.equal(itemMatches.length, 8, "Evidence-process list must contain exactly eight complete items");
 
-  assert.deepEqual(items, [
+  const unmatchedMarkup = listMatch[1].replace(/<li\b[^>]*>[\s\S]*?<\/li>/g, "").trim();
+  assert.equal(unmatchedMarkup, "", "Evidence-process list must not contain unmatched or unrelated markup");
+
+  const expectedHeadings = [
     "Define the installation problem",
     "Document a working design decision",
     "Build and inspect the CAD model",
@@ -38,8 +41,18 @@ test("Design & Fabrication presents exactly eight ordered evidence gates", () =>
     "Evaluate fit, retention, vibration, pull, access, and serviceability",
     "Record revision decisions",
     "Prepare for a small batch"
-  ]);
-  assert.equal((listMatch[1].match(/<li\b/g) ?? []).length, 8);
+  ];
+
+  itemMatches.forEach((match, index) => {
+    const content = match[1];
+    const structure = content.match(/^\s*<strong>([^<]+)<\/strong>\s*<p>([^<]+)<\/p>\s*$/);
+    assert.ok(
+      structure,
+      `Evidence gate ${index + 1} must contain exactly one strong heading and one text description`
+    );
+    assert.equal(structure[1], expectedHeadings[index]);
+    assert.notEqual(structure[2].trim(), "", `Evidence gate ${index + 1} description must not be empty`);
+  });
 });
 
 test("Design & Fabrication removes decorative process art and describes the company-owned pipeline", () => {
@@ -48,7 +61,7 @@ test("Design & Fabrication removes decorative process art and describes the comp
   const section = extractSectionByLabelledBy(design, "evidence-process-heading");
   assert.match(section, /Company-owned development process/);
   assert.match(section, /own automotive hardware pipeline/);
-  assert.doesNotMatch(section, /contract manufacturing services|client CAD services/i);
+  assert.doesNotMatch(design, /contract manufacturing services|client CAD services/i);
 });
 
 test("Design & Fabrication states the bounded current development status", () => {
