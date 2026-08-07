@@ -80,19 +80,56 @@ function decodeHtmlEntities(text) {
   });
 }
 
-function renderedVisibleText(html) {
-  const textOnly = html
+function stripNonPublicContent(html) {
+  return html
     .replace(/<!--[\s\S]*?-->/g, " ")
-    .replace(/<(script|style|template|noscript)\b[^>]*>[\s\S]*?<\/\1>/gi, " ")
-    .replace(/<[^>]+>/g, " ");
+    .replace(/<(script|style|template|noscript)\b[^>]*>[\s\S]*?<\/\1>/gi, " ");
+}
 
-  return decodeHtmlEntities(textOnly).replace(/\s+/gu, " ").trim();
+function normalizePublicText(text) {
+  return decodeHtmlEntities(text).replace(/\s+/gu, " ").trim();
+}
+
+function renderedVisibleText(html) {
+  return normalizePublicText(stripNonPublicContent(html).replace(/<[^>]+>/g, " "));
+}
+
+function publicTextAttributeValues(html) {
+  const values = [];
+  const publicHtml = stripNonPublicContent(html);
+
+  for (const match of publicHtml.matchAll(/<([a-z][\w:-]*)\b([^>]*)>/gi)) {
+    const tagName = match[1].toLowerCase();
+    const attributes = match[2];
+
+    for (const attributeName of ["alt", "title", "aria-label"]) {
+      const value = attributeValue(attributes, attributeName);
+      if (value !== undefined) {
+        values.push(normalizePublicText(value));
+      }
+    }
+
+    if (tagName === "meta" && attributeValue(attributes, "name")?.toLowerCase() === "description") {
+      const description = attributeValue(attributes, "content");
+      if (description !== undefined) {
+        values.push(normalizePublicText(description));
+      }
+    }
+  }
+
+  return values;
 }
 
 function assertAutomotiveScope(route, html) {
-  const visibleText = renderedVisibleText(html).toLowerCase();
+  const publicText = [renderedVisibleText(html), ...publicTextAttributeValues(html)]
+    .map((value) => value.toLowerCase());
+
   for (const topic of forbiddenTopics) {
-    assert.ok(!visibleText.includes(topic.toLowerCase()), `${route} contains forbidden topic: ${topic}`);
+    const normalizedTopic = topic.toLowerCase();
+    assert.ok(
+      publicText.every((value) => !value.includes(normalizedTopic)),
+      `${route} contains forbidden topic: ${topic}`
+    );
   }
 }
 
@@ -203,12 +240,29 @@ test("automotive-scope checks reject encoded and markup-split visible phrases", 
     "<main>smart&#32;home</main>",
     "<main>smart&#x20;home</main>",
     "<main>smart&nbsp;home</main>",
-    "<main>smart <span>home</span></main>"
+    "<main>smart <span>home</span></main>",
+    '<img src="safe.png" alt="smart&#32;home">',
+    '<button type="button" title="smart&#x20;home">Open</button>',
+    '<button type="button" aria-label="smart&nbsp;home"></button>',
+    '<meta name="description" content="smart home">'
   ];
 
   for (const mutation of mutations) {
     assert.throws(() => assertAutomotiveScope("in-memory.html", mutation), /smart home/);
   }
+
+  assert.doesNotThrow(() => {
+    assertAutomotiveScope(
+      "non-public-attributes.html",
+      [
+        '<a href="/smart home"><img src="smart home.png" alt=""><object code="smart home"></object></a>',
+        '<script aria-label="smart home">const example = "smart home";</script>',
+        '<style title="smart home">.smart-home { display: block; }</style>',
+        '<template aria-label="smart home">smart home</template>',
+        '<noscript title="smart home">smart home</noscript>'
+      ].join("")
+    );
+  });
 });
 
 test("primary navigation labels preserve route-aware relationships", () => {
