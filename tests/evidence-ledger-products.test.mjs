@@ -17,13 +17,28 @@ test("products page is a development queue", () => {
   ]);
 });
 
+test("products page leads with one clearly bounded active product", () => {
+  const activeRecord = html.match(/<section\b[^>]*class="[^"]*\bactive-product-feature\b[^"]*"[^>]*>[\s\S]*?<\/section>/)?.[0] ?? "";
+
+  assert.match(activeRecord, /Active development/);
+  assert.match(activeRecord, /HIS-CA-001A/);
+  assert.match(activeRecord, /CAD in progress/);
+  assert.match(activeRecord, /Stage 03 of 07/i);
+  assert.match(activeRecord, /his-ca-001a-rev-a-cad-work-in-progress\.png/);
+});
+
 test("only HIS-CA-001A is shown in CAD progress", () => {
   const activeRecord = html.match(/<section class="section evidence-section"[\s\S]*?<\/section>/)?.[0] ?? "";
   const plannedProducts = html.match(/<section class="section" aria-labelledby="planned-products-heading"[\s\S]*?<section class="section status-section"/)?.[0] ?? "";
 
   assert.match(activeRecord, /CAD in progress/);
   assert.doesNotMatch(plannedProducts, /CAD in progress/);
-  assert.equal((plannedProducts.match(/Planned concept/g) || []).length, 5);
+  assert.equal((plannedProducts.match(/Planned direction/g) || []).length, 5);
+});
+
+test("planned directions expose stable speaker-fitment and mounting-routing destinations", () => {
+  assert.match(html, /\bid="speaker-fitment"/);
+  assert.match(html, /\bid="mounting-routing"/);
 });
 
 test("planned queue binds all five SKUs to ordered ledger cards", () => {

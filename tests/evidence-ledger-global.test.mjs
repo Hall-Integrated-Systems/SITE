@@ -13,7 +13,7 @@ const routes = [
   "sitemap.html"
 ];
 
-const refreshedRoutes = routes.slice(0, 5);
+const refreshedRoutes = routes;
 const forbiddenTopics = [
   "smart home",
   "home networking",
@@ -26,9 +26,8 @@ const forbiddenTopics = [
   "non-automotive technology offerings"
 ];
 const navigationItems = [
-  ["Home", "index.html"],
-  ["Products & Prototypes", "products.html"],
-  ["Design & Fabrication", "design-fabrication.html"],
+  ["Products", "products.html"],
+  ["Development", "design-fabrication.html"],
   ["About", "about.html"],
   ["Contact", "contact.html"]
 ];
@@ -158,9 +157,15 @@ function escapeRegExp(value) {
 function assertNavigationContract(route, html) {
   const header = extractElement(html, "header", `${route} site header`);
   const navigation = extractElement(header, "nav", `${route} primary navigation`);
+  const navigationList = extractElement(navigation, "ul", `${route} primary navigation list`);
   assert.match(navigation, /\baria-label\s*=\s*(["'])Main navigation\1/i, `${route} navigation lost its accessible label`);
 
-  const links = linksIn(navigation);
+  const links = linksIn(navigationList);
+  assert.deepEqual(
+    links.map((link) => link.label),
+    navigationItems.map(([label]) => label),
+    `${route} must expose exactly the approved four primary-navigation labels`
+  );
   for (const [label, destination] of navigationItems) {
     const matchingLinks = links.filter((link) => link.label === label);
     assert.equal(matchingLinks.length, 1, `${route} must contain one "${label}" primary-navigation link`);
@@ -170,6 +175,22 @@ function assertNavigationContract(route, html) {
       `${route} has the wrong primary-navigation destination for "${label}"`
     );
   }
+}
+
+function metaContent(html, attributeName, attributeValueToMatch) {
+  const metas = [...html.matchAll(/<meta\b([^>]*)>/gi)].map((match) => match[1]);
+  const attributes = metas.find((candidate) =>
+    attributeValue(candidate, attributeName)?.toLowerCase() === attributeValueToMatch.toLowerCase()
+  );
+  return attributes ? attributeValue(attributes, "content") : undefined;
+}
+
+function canonicalHref(html) {
+  const links = [...html.matchAll(/<link\b([^>]*)>/gi)].map((match) => match[1]);
+  const attributes = links.find((candidate) =>
+    attributeValue(candidate, "rel")?.toLowerCase().split(/\s+/).includes("canonical")
+  );
+  return attributes ? attributeValue(attributes, "href") : undefined;
 }
 
 function assertRefreshedShellContract(route, html) {
@@ -215,6 +236,23 @@ test("all existing HTML routes preserve the public Clarity ID", () => {
   for (const route of routes) {
     const matches = readText(route).match(/xa3uw9a04d/g) ?? [];
     assert.equal(matches.length, 1, `${route} must contain the public Clarity ID exactly once`);
+  }
+});
+
+test("every public route exposes self-consistent canonical and Open Graph metadata", () => {
+  const socialImage = "https://hallintegratedsystems.com/assets/his-product-lineup-banner_text_friendly.jpg";
+
+  for (const route of routes) {
+    const html = readText(route);
+    const routeUrl = route === "index.html"
+      ? "https://hallintegratedsystems.com/"
+      : `https://hallintegratedsystems.com/${route}`;
+    assert.equal(canonicalHref(html), routeUrl, `${route} must use its production URL as canonical`);
+    assert.ok(metaContent(html, "property", "og:title"), `${route} is missing an Open Graph title`);
+    assert.ok(metaContent(html, "property", "og:description"), `${route} is missing an Open Graph description`);
+    assert.equal(metaContent(html, "property", "og:type"), "website", `${route} has the wrong Open Graph type`);
+    assert.equal(metaContent(html, "property", "og:url"), routeUrl, `${route} has the wrong Open Graph URL`);
+    assert.equal(metaContent(html, "property", "og:image"), socialImage, `${route} has the wrong Open Graph image`);
   }
 });
 
@@ -310,4 +348,22 @@ test("static hosting and contact files retain required signals", () => {
   assert.match(readText("script.js"), /contact_form_submit_success/);
   assert.match(readText("robots.txt"), /Sitemap:/);
   assert.match(readText("sitemap.xml"), /his-ca-001a-cable-comb/);
+});
+
+test("crawler files use the canonical host and the refresh modification date", () => {
+  const sitemap = readText("sitemap.xml");
+  const records = [...sitemap.matchAll(/<url>\s*<loc>([^<]+)<\/loc>\s*<lastmod>([^<]+)<\/lastmod>[\s\S]*?<\/url>/g)]
+    .map(([, location, modified]) => ({ location, modified }));
+
+  assert.deepEqual(records, [
+    { location: "https://hallintegratedsystems.com/", modified: "2026-09-17" },
+    { location: "https://hallintegratedsystems.com/products.html", modified: "2026-09-17" },
+    { location: "https://hallintegratedsystems.com/products/his-ca-001a-cable-comb.html", modified: "2026-09-17" },
+    { location: "https://hallintegratedsystems.com/design-fabrication.html", modified: "2026-09-17" },
+    { location: "https://hallintegratedsystems.com/about.html", modified: "2026-09-17" },
+    { location: "https://hallintegratedsystems.com/contact.html", modified: "2026-09-17" },
+    { location: "https://hallintegratedsystems.com/privacy.html", modified: "2026-09-17" }
+  ]);
+  assert.match(readText("robots.txt"), /^Sitemap: https:\/\/hallintegratedsystems\.com\/sitemap\.xml$/m);
+  assert.doesNotMatch(`${sitemap}\n${readText("robots.txt")}`, /https:\/\/www\.hallintegratedsystems\.com/);
 });

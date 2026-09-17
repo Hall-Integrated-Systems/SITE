@@ -12,6 +12,14 @@ test("product page identifies the current revision and bounded status", () => {
   assert.doesNotMatch(html, /proper commercial Autodesk Fusion access|CAD modeling pending/i);
 });
 
+test("product dossier keeps availability beside its working status", () => {
+  const statusStrip = html.match(/<div\b[^>]*class="[^"]*\bdossier-status-strip\b[^"]*"[^>]*>[\s\S]*?<\/div>/)?.[0] ?? "";
+
+  assert.match(statusStrip, /CAD in progress/);
+  assert.match(statusStrip, /REV-A/);
+  assert.match(statusStrip, /not available for sale/i);
+});
+
 test("product page shows all seven status gates in order", () => {
   const rail = html.match(/<ol class="development-rail"[^>]*>([\s\S]*?)<\/ol>/);
   assert.ok(rail, "Missing development status rail");

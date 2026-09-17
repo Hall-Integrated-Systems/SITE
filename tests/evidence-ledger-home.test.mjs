@@ -16,27 +16,45 @@ function getSection(marker) {
   return html.slice(sectionStart, sectionEnd + "</section>".length);
 }
 
-test("homepage sections follow the approved evidence hierarchy", () => {
+test("homepage sections follow the approved Option 3 discovery hierarchy", () => {
   assertContainsInOrder(html, [
-    '<section class="evidence-hero">',
-    '<section class="section status-section"',
-    '<section class="evidence-section"',
-    '<section class="section journal-section"',
-    'aria-labelledby="installation-context-heading"',
-    '<section class="cta-band">'
+    '<section class="home-hero"',
+    'aria-labelledby="products-taking-shape-heading"',
+    'aria-labelledby="why-his-builds-heading"',
+    'aria-labelledby="current-development-heading"',
+    'aria-labelledby="founder-band-heading"',
+    '<section class="cta-band"'
   ]);
 
-  const hero = getSection('<section class="evidence-hero">');
+  const hero = getSection('<section class="home-hero"');
   assertContainsInOrder(hero, [
-    "Automotive product development",
-    "Automotive hardware, documented as it develops.",
-    "Review HIS-CA-001A evidence"
+    "ORIGINAL AUTOMOTIVE HARDWARE",
+    "Solve the install. Build the part.",
+    "Discover What We're Building",
+    "Meet Hall Integrated Systems"
   ]);
 
-  assert.match(getSection('<section class="section status-section"'), /Current development status/);
-  assert.match(getSection('<section class="evidence-section"'), /HIS-CA-001A 4-Wire Speaker Cable Comb/);
-  assert.match(getSection('<section class="section journal-section"'), /Development journal/);
-  assert.match(getSection('aria-labelledby="installation-context-heading"'), /Installation context/);
+  const products = getSection('aria-labelledby="products-taking-shape-heading"');
+  assert.match(products, /Products taking shape/);
+  assert.equal((products.match(/<article\b[^>]*class="[^"]*\bproduct-direction\b[^"]*"/g) ?? []).length, 3);
+  assert.equal((products.match(/Active development/g) ?? []).length, 1);
+  assert.equal((products.match(/Planned direction/g) ?? []).length, 2);
+});
+
+test("homepage separates the photographed reference from the active-product status", () => {
+  const hero = getSection('<section class="home-hero"');
+  const status = hero.match(/<div\b[^>]*class="[^"]*\bhero-status\b[^"]*"[^>]*>[\s\S]*?<\/div>/)?.[0] ?? "";
+  const media = hero.match(/<figure\b[^>]*class="[^"]*\bhero-media\b[^"]*"[^>]*>[\s\S]*?<\/figure>/)?.[0] ?? "";
+
+  assert.match(status, /ACTIVE PRODUCT DEVELOPMENT/);
+  assert.match(status, /HIS-CA-001A/);
+  assert.match(status, /CAD IN PROGRESS/);
+  assert.match(status, /STAGE 03 OF 07/);
+  assert.doesNotMatch(status, /prototype\/reference/i);
+
+  assert.match(media, /Photographed installation prototype\/reference/i);
+  assert.match(media, /not HIS-CA-001A/i);
+  assert.doesNotMatch(media, /CAD IN PROGRESS/);
 });
 
 test("homepage shows the seven stages with CAD as current", () => {
@@ -69,7 +87,7 @@ test("homepage shows the seven stages with CAD as current", () => {
   ]);
 });
 
-test("homepage uses bounded CAD and licensing copy", () => {
+test("homepage uses bounded CAD evidence copy", () => {
   assert.match(html, /Commercial CAD access established/);
   assert.match(html, /CAD work-in-progress capture recorded August 6, 2026/);
   assert.match(html, /REV-A working design decision documented/);

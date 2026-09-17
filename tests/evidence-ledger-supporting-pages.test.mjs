@@ -4,6 +4,8 @@ import { readText } from "./site-fixture.mjs";
 
 const design = readText("design-fabrication.html");
 const about = readText("about.html");
+const contact = readText("contact.html");
+const sitemap = readText("sitemap.html");
 
 function extractSectionByLabelledBy(html, id) {
   const pattern = new RegExp(
@@ -78,7 +80,7 @@ test("Design & Fabrication preserves photographed-prototype disclosures", () => 
   assert.match(section, /Tiny printed labels are not specification references/);
 });
 
-test("About states the current licensing and product milestone", () => {
+test("About states capability and the current product milestone without equipment inventory", () => {
   const hero = about.match(/<section\b[^>]*class="[^"]*\bpage-hero\b[^"]*"[^>]*>[\s\S]*?<\/section>/)?.[0];
   assert.ok(hero, "Missing About page hero");
   assert.match(hero, /Commercial CAD access established/);
@@ -86,9 +88,31 @@ test("About states the current licensing and product milestone", () => {
   assert.match(hero, /prototype print and validation remain pending/);
 
   const milestone = extractArticleByHeading(about, "Building Hall Integrated Systems");
-  assert.match(milestone, /QIDI Plus4, on July 21, 2026/);
+  assert.doesNotMatch(about, /QIDI Plus4|July 21, 2026/);
+  assert.match(milestone, /in-house prototyping capability/i);
   assert.match(milestone, /Commercial CAD access established/);
   assert.match(milestone, /CAD modeling is in progress/);
   assert.match(milestone, /representative coupon, complete prototype print, dimensional review, fit evaluation, revision outcome, and small-batch preparation remain pending/);
   assert.doesNotMatch(milestone, /holding CAD|proper commercial software licensing is in place/i);
+});
+
+test("Contact invites the approved inquiry types and preserves accessible error relationships", () => {
+  assert.match(contact, /product-development questions/i);
+  assert.match(contact, /prototype feedback/i);
+  assert.match(contact, /company information/i);
+  assert.match(
+    contact,
+    /<form\b[^>]*action="https:\/\/his-contact-api-d1378abe\.azurewebsites\.net\/api\/contact"[^>]*method="POST"/i
+  );
+
+  for (const field of ["name", "email", "subject", "message"]) {
+    const control = contact.match(new RegExp(`<(?:input|textarea)\\b(?=[^>]*\\bid="${field}")(?=[^>]*\\baria-describedby="${field}-error")[^>]*>`, "i"));
+    assert.ok(control, `${field} must reference its inline error message`);
+    assert.match(contact, new RegExp(`<p\\b[^>]*\\bid="${field}-error"[^>]*>`, "i"));
+  }
+});
+
+test("human-readable sitemap uses the refreshed Development label", () => {
+  assert.match(sitemap, /<a href="design-fabrication\.html">Development<\/a>/);
+  assert.doesNotMatch(sitemap, /<a href="design-fabrication\.html">Design &amp; Fabrication<\/a>/);
 });

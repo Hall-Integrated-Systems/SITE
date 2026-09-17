@@ -3,8 +3,14 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Contact | Hall Integrated Systems, LLC</title>
-  <meta name="description" content="Contact Hall Integrated Systems, LLC about prototype automotive installation hardware, 3D-printed car audio component concepts, and 12V electronics mounting hardware development.">
+  <title>Contact Hall Integrated Systems | Product Development Inquiries</title>
+  <meta name="description" content="Contact Hall Integrated Systems about automotive installation hardware development, prototype feedback, and company information.">
+  <link rel="canonical" href="https://hallintegratedsystems.com/contact.html">
+  <meta property="og:title" content="Contact Hall Integrated Systems | Product Development Inquiries">
+  <meta property="og:description" content="Ask about automotive installation hardware development, prototype feedback, or Hall Integrated Systems.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://hallintegratedsystems.com/contact.html">
+  <meta property="og:image" content="https://hallintegratedsystems.com/assets/his-product-lineup-banner_text_friendly.jpg">
   <link rel="icon" type="image/png" href="assets/logo-h-circuit-nohalo.png">
   <link rel="apple-touch-icon" href="assets/logo-h-circuit-nohalo.png">
   <link rel="stylesheet" href="style.css">
@@ -19,14 +25,11 @@
 <body>
   <header class="site-header">
     <nav class="navbar" aria-label="Main navigation">
-      <a class="brand" href="index.html" aria-label="Hall Integrated Systems home">
-        <span class="brand-text">Hall Integrated Systems</span>
-      </a>
+      <a class="brand" href="index.html" aria-label="Hall Integrated Systems home"><span class="brand-text">Hall Integrated Systems</span></a>
       <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="primary-navigation" aria-label="Toggle navigation"><span></span><span></span><span></span></button>
       <ul class="nav-links" id="primary-navigation">
-        <li><a href="index.html">Home</a></li>
-        <li><a href="products.html">Products &amp; Prototypes</a></li>
-        <li><a href="design-fabrication.html">Design &amp; Fabrication</a></li>
+        <li><a href="products.html">Products</a></li>
+        <li><a href="design-fabrication.html">Development</a></li>
         <li><a href="about.html">About</a></li>
         <li><a class="active" href="contact.html" aria-current="page">Contact</a></li>
       </ul>
@@ -34,18 +37,23 @@
   </header>
 
   <main>
-    <section class="page-hero page-hero--image">
+    <section class="page-hero">
       <p class="eyebrow">CONTACT</p>
-      <h1>Contact Hall Integrated Systems.</h1>
-      <p>Reach out with questions about Hall Integrated Systems, its product concepts, development status, or general company information.</p>
-      <p class="hero-visual-note">Concept visualization for product-development planning. CAD model and prototype print pending.</p>
+      <h1>Start a useful conversation.</h1>
+      <p>Reach out with product-development questions, prototype feedback, or a request for company information.</p>
+      <p class="hero-visual-note">Hall Integrated Systems is currently documenting its own automotive hardware pipeline and welcomes inquiries that relate to that work.</p>
     </section>
 
-    <section class="section contact-layout">
+    <section class="section contact-layout" aria-labelledby="contact-form-heading">
       <article class="contact-panel">
-        <h2>Company Contact</h2>
-        <p>Use the form below for general questions, prototype feedback, product information, or company information.</p>
-        <p class="contact-email">Email: <strong>info@hallintegratedsystems.com</strong></p>
+        <p class="eyebrow">COMPANY CONTACT</p>
+        <h2 id="contact-form-heading">What can we help with?</h2>
+        <ul class="contact-topics">
+          <li>Questions about an active development record</li>
+          <li>Relevant prototype or installation feedback</li>
+          <li>General Hall Integrated Systems information</li>
+        </ul>
+        <p class="contact-email">Email: <a href="mailto:info@hallintegratedsystems.com"><strong>info@hallintegratedsystems.com</strong></a></p>
       </article>
 
       <form class="contact-form" id="contact-form" action="https://his-contact-api-d1378abe.azurewebsites.net/api/contact" method="POST" novalidate>
@@ -55,25 +63,25 @@
         </div>
         <div class="form-row">
           <label for="name">Name</label>
-          <input type="text" id="name" name="name" autocomplete="name" required>
+          <input type="text" id="name" name="name" autocomplete="name" aria-describedby="name-error" aria-invalid="false" required>
           <p class="field-error" id="name-error"></p>
         </div>
         <div class="form-row">
           <label for="email">Email</label>
-          <input type="email" id="email" name="email" autocomplete="email" required>
+          <input type="email" id="email" name="email" autocomplete="email" aria-describedby="email-error" aria-invalid="false" required>
           <p class="field-error" id="email-error"></p>
         </div>
         <div class="form-row">
           <label for="subject">Subject</label>
-          <input type="text" id="subject" name="subject" required>
+          <input type="text" id="subject" name="subject" aria-describedby="subject-error" aria-invalid="false" required>
           <p class="field-error" id="subject-error"></p>
         </div>
         <div class="form-row">
           <label for="message">Message</label>
-          <textarea id="message" name="message" rows="6" required></textarea>
+          <textarea id="message" name="message" rows="6" aria-describedby="message-error" aria-invalid="false" required></textarea>
           <p class="field-error" id="message-error"></p>
         </div>
-        <button class="button button-primary" type="submit">Send Message</button>
+        <button class="button button-primary" type="submit">Send message</button>
         <p class="form-status" id="form-status" role="status" aria-live="polite"></p>
       </form>
     </section>
@@ -81,10 +89,7 @@
 
   <footer class="site-footer">
     <p>&copy; 2026 Hall Integrated Systems, LLC. All rights reserved.</p>
-    <div class="footer-links">
-      <a href="privacy.html">Privacy</a>
-      <a href="sitemap.html">Sitemap</a>
-    </div>
+    <div class="footer-links"><a href="privacy.html">Privacy</a><a href="sitemap.html">Sitemap</a></div>
   </footer>
   <script src="script.js"></script>
 </body>
