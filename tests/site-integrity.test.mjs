@@ -84,3 +84,15 @@ test("every content image has a non-empty text alternative", () => {
     }
   }
 });
+
+test("Azure pull-request cleanup receives the deployment token", () => {
+  const workflow = readText(".github/workflows/azure-static-web-apps-orange-smoke-082f2870f.yml");
+  const closeJob = workflow.split("close_pull_request_job:")[1];
+
+  assert.ok(closeJob, "Azure workflow must define the pull-request cleanup job");
+  assert.match(
+    closeJob,
+    /azure_static_web_apps_api_token:\s*\$\{\{\s*secrets\.AZURE_STATIC_WEB_APPS_API_TOKEN_ORANGE_SMOKE_082F2870F\s*\}\}/,
+    "Azure pull-request cleanup must receive the same deployment token as uploads"
+  );
+});
