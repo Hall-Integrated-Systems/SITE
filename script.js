@@ -137,6 +137,38 @@ document.addEventListener("DOMContentLoaded", function () {
   var submitButton = form.querySelector('button[type="submit"]');
   var emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
+  // Only accept a customer-initiated handoff from the Studio window that opened this page.
+  var studioOrigin = "";
+  var isLocalSite = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1";
+  if (window.opener) {
+    var receivedStudioDetails = false;
+    window.addEventListener("message", function (event) {
+      var data = event.data;
+      if (receivedStudioDetails || event.source !== window.opener || !data) return;
+      var allowedOrigin = event.origin === "https://studio.hallintegratedsystems.com" || (isLocalSite && event.origin === "http://127.0.0.1:5186");
+      if (!allowedOrigin) return;
+      if (data.type === "his-plate-contact-hello") {
+        studioOrigin = event.origin;
+        window.opener.postMessage({ type: "his-plate-contact-ready" }, studioOrigin);
+        return;
+      }
+      if (event.origin !== studioOrigin || data.type !== "his-plate-contact-details") return;
+      if (typeof data.message !== "string" || !data.message.trim() || data.message.length > 5000 || typeof data.name !== "string" || data.name.length > 120 || typeof data.email !== "string" || data.email.length > 254) return;
+      var nameField = form.querySelector('[name="name"]');
+      var emailField = form.querySelector('[name="email"]');
+      var subjectField = form.querySelector('[name="subject"]');
+      var messageField = form.querySelector('[name="message"]');
+      if (!nameField || !emailField || !subjectField || !messageField || nameField.value || emailField.value || subjectField.value || messageField.value) return;
+      nameField.value = data.name;
+      emailField.value = data.email;
+      subjectField.value = "Speaker mounting plate inquiry";
+      messageField.value = data.message;
+      receivedStudioDetails = true;
+      if (status) status.textContent = "Your Studio details are ready to review. Nothing has been sent yet.";
+      window.opener.postMessage({ type: "his-plate-contact-received" }, studioOrigin);
+    });
+  }
+
   function setError(fieldId, message) {
     var error = document.getElementById(fieldId + "-error");
     var field = document.getElementById(fieldId);

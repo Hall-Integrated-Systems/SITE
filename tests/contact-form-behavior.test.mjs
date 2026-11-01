@@ -15,7 +15,7 @@ class Field {
   }
 }
 
-function loadContactForm() {
+function loadContactForm(options = {}) {
   const fields = new Map([
     ["name", new Field("name")],
     ["email", new Field("email")],
@@ -63,8 +63,13 @@ function loadContactForm() {
       return null;
     }
   };
+  const windowHandlers = new Map();
+  const readyMessages = [];
+  const opener = options.withOpener ? { postMessage(data, origin) { readyMessages.push({ data, origin }); } } : null;
+  document.referrer = options.referrer || '';
   const window = {
-    addEventListener() {},
+    opener,
+    addEventListener(type, handler) { windowHandlers.set(type, handler); },
     location: {
       hostname: "127.0.0.1",
       href: "http://127.0.0.1:4173/contact.html",
@@ -89,7 +94,7 @@ function loadContactForm() {
     formHandlers.get("submit")({ preventDefault() {} });
   }
 
-  return { errors, fields, getFetchCalls: () => fetchCalls, status, submit };
+  return { errors, fields, getFetchCalls: () => fetchCalls, status, submit, windowHandlers, opener, readyMessages };
 }
 
 test("empty contact form reports every required field without sending", () => {
@@ -101,6 +106,32 @@ test("empty contact form reports every required field without sending", () => {
   assert.equal(contact.errors.get("subject").textContent, "Please enter a subject.");
   assert.equal(contact.errors.get("message").textContent, "Please include a message.");
   assert.equal(contact.status.textContent, "Please correct the highlighted fields before submitting.");
+  assert.equal(contact.getFetchCalls(), 0);
+});
+
+test("contact handoff rejects other windows and preserves text already entered", () => {
+  const contact = loadContactForm({ withOpener: true });
+  const message = contact.windowHandlers.get('message');
+  message({ origin: 'https://studio.hallintegratedsystems.com', source: {}, data: { type: 'his-plate-contact-hello' } });
+  assert.equal(contact.readyMessages.length, 0);
+  message({ origin: 'https://studio.hallintegratedsystems.com', source: contact.opener, data: { type: 'his-plate-contact-hello' } });
+  contact.fields.get('message').value = 'Already typed';
+  message({ origin: 'https://studio.hallintegratedsystems.com', source: contact.opener, data: { type: 'his-plate-contact-details', message: 'Replacement', name: '', email: '' } });
+  assert.equal(contact.fields.get('message').value, 'Already typed');
+  assert.equal(contact.getFetchCalls(), 0);
+});
+
+test("contact form accepts project details only from its trusted Studio opener without submitting", () => {
+  const contact = loadContactForm({ withOpener: true });
+  const message = contact.windowHandlers.get('message');
+  message({ origin: 'https://studio.hallintegratedsystems.com', source: contact.opener, data: { type: 'his-plate-contact-hello' } });
+  assert.equal(contact.readyMessages.length, 1);
+  message({ origin: 'https://evil.example', source: contact.opener, data: { type: 'his-plate-contact-details', message: 'Untrusted' } });
+  assert.equal(contact.fields.get('message').value, '');
+  message({ origin: 'https://studio.hallintegratedsystems.com', source: contact.opener, data: { type: 'his-plate-contact-details', message: 'Outside diameter: 197 mm', name: 'Customer', email: 'customer@example.com' } });
+  assert.equal(contact.fields.get('message').value, 'Outside diameter: 197 mm');
+  assert.equal(contact.fields.get('name').value, 'Customer');
+  assert.equal(contact.fields.get('subject').value, 'Speaker mounting plate inquiry');
   assert.equal(contact.getFetchCalls(), 0);
 });
 
