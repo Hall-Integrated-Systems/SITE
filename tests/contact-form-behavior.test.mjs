@@ -135,6 +135,16 @@ test("contact form accepts project details only from its trusted Studio opener w
   assert.equal(contact.getFetchCalls(), 0);
 });
 
+test("ring inquiries use a ring subject and transfer measurements without submitting", () => {
+  const contact = loadContactForm({ withOpener: true });
+  const receive = contact.windowHandlers.get('message');
+  receive({ origin: 'https://studio.hallintegratedsystems.com', source: contact.opener, data: { type: 'his-plate-contact-hello' } });
+  receive({ origin: 'https://studio.hallintegratedsystems.com', source: contact.opener, data: { type: 'his-ring-contact-details', message: 'Outside diameter: 200 mm', name: 'Sample', email: 'sample@example.com' } });
+  assert.equal(contact.fields.get('subject').value, 'Spacer ring inquiry');
+  assert.equal(contact.fields.get('message').value, 'Outside diameter: 200 mm');
+  assert.equal(contact.getFetchCalls(), 0);
+});
+
 test("invalid email is rejected locally without sending", () => {
   const contact = loadContactForm();
   contact.fields.get("name").value = "Visitor";

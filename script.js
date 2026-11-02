@@ -152,7 +152,7 @@ document.addEventListener("DOMContentLoaded", function () {
         window.opener.postMessage({ type: "his-plate-contact-ready" }, studioOrigin);
         return;
       }
-      if (event.origin !== studioOrigin || data.type !== "his-plate-contact-details") return;
+      if (event.origin !== studioOrigin || (data.type !== "his-plate-contact-details" && data.type !== "his-ring-contact-details")) return;
       if (typeof data.message !== "string" || !data.message.trim() || data.message.length > 5000 || typeof data.name !== "string" || data.name.length > 120 || typeof data.email !== "string" || data.email.length > 254) return;
       var nameField = form.querySelector('[name="name"]');
       var emailField = form.querySelector('[name="email"]');
@@ -161,7 +161,7 @@ document.addEventListener("DOMContentLoaded", function () {
       if (!nameField || !emailField || !subjectField || !messageField || nameField.value || emailField.value || subjectField.value || messageField.value) return;
       nameField.value = data.name;
       emailField.value = data.email;
-      subjectField.value = "Speaker mounting plate inquiry";
+      subjectField.value = data.type === "his-ring-contact-details" ? "Spacer ring inquiry" : "Speaker mounting plate inquiry";
       messageField.value = data.message;
       receivedStudioDetails = true;
       if (status) status.textContent = "Your Studio details are ready to review. Nothing has been sent yet.";
